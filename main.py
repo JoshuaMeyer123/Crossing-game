@@ -9,7 +9,8 @@ screen.setup(width=600, height=600)
 screen.tracer(0)
 
 player = Player()
-#scoreboard = Scoreboard()
+scoreboard = Scoreboard()
+car_manager = CarManager()
 
 screen.listen()
 screen.onkey(player.move, 'Up')
@@ -19,17 +20,21 @@ counter = 0
 
 game_is_on = True
 while game_is_on:
-    #scoreboard.update()
     time.sleep(0.1)
     screen.update()
-    player.finish_line()
+    # Detect when turtle reaches the finish line
+    if player.finish_line():
+        scoreboard.update()
+        car_manager.faster()
+    # Create a car every six loops
     if counter % 6 == 0:
-        car_manager = CarManager()
-        cars.append(car_manager)
-    for car in cars:
-        car.move()
-        if player.distance(car)<28 and abs(player.ycor() - car.ycor()) <= 20:
+        car_manager.create_car()
+    car_manager.move()
+    # Detect when turtle collides with a car
+    for car in car_manager.cars:
+        if player.distance(car) < 20:
             game_is_on = False
+            scoreboard.game_over()
     counter += 1
 
 
